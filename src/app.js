@@ -1,24 +1,14 @@
 import express from "express";
-import connectDatabase from "./config/dbConnect.js";
-import routes from "./routes/index.js";
+import db from "./config/dbConnect.js"
+import routes from "./routes/index.js"
 
-const connection = await connectDatabase();
-connection.on("error", (erro) => {
-  console.error("erro de conexão: ", erro);
-});
+db.on("error", console.log.bind(console, 'Erro de conexão'))
+db.once("open", () => {
+  console.log('conexão com o banco feita com sucesso')
+})
 
-connection.once("open", () => {
-  console.log("Conexão estabelecida com sucesso");
-});
-
-const app = express(); // app guarda tudo, absolutamente tudo que existe dentro do framework express
+const app = express();
+app.use(express.json())
 routes(app);
 
-
-app.delete("/livros/:id", (req, res) => {
-  const index = findBook(req.params.id);
-  livros.splice(index, 1);
-  res.status(200).send("Livro deletado com sucesso");
-});
-
-export default app;
+export default app

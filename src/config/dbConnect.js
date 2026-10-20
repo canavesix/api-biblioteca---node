@@ -1,9 +1,7 @@
-import mongoose from "mongoose";
+import mongoose from "mongoose"
 
-async function connectDatabase() {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log("Banco conectado!");
-    return mongoose.connection;
-}
+mongoose.connect("mongodb+srv://alura:123@alura.dkjed.mongodb.net/alura-node");
 
-export default connectDatabase;
+let db = mongoose.connection;
+
+export default db;
