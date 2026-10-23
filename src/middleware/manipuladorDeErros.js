@@ -9,8 +9,12 @@ function manipuladorDeErros(erro, req, res, next) {
         .send({
           message: "Um ou mais dados foram informados de forma incorreta.",
         });
+    } else if (erro instanceof mongoose.Error.ValidationError) {
+      const mensagensErros = Object.values(erro.errors).map(erro => erro.message).join("; ")
+
+      res.status(400).send({message: `Os seguintes erros foram encontrados: ${mensagensErros}`});
     } else {
-      res.status(500).send({ message: "erro interno no servidor" });
+      res.status(500).send({ message: "Erro interno no servidor" });
     }
   }
 }

@@ -75,9 +75,6 @@ class LivroController {
       next(erro);
     }
   }
-
-
-
 }
 
 export default LivroController
