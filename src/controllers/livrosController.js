@@ -1,5 +1,5 @@
 import NaoEncontrado from "../erros/NaoEncontrado.js";
-import {livros} from "../models/index.js";
+import {autores, livros} from "../models/index.js";
 
 class LivroController {
 
@@ -77,11 +77,32 @@ class LivroController {
     }
   }
 
-  static listarLivroPorEditora = async (req, res, next) => {
+  static listarLivroPorFiltro = async (req, res, next) => {
     try {
-      const editora = req.query.editora;
+      const { editora, titulo, nomeAutor, minPaginas, maxPaginas } = req.query;
 
-      const livrosResultado = await livros.find({"editora": editora});
+      const busca = {};
+
+      if (editora) busca.editora = editora;
+      if (titulo) busca.titulo = { $regex: titulo, $options: "i" };
+
+      if (minPaginas || maxPaginas) busca.numeroPaginas = {};
+      if (minPaginas) busca.numeroPaginas.$gte = minPaginas;
+      if (maxPaginas) busca.numeroPaginas.$lte = maxPaginas;
+
+      if (nomeAutor) {
+        const autoresEncontrados = await autores.find({ nome: { $regex: nomeAutor, $options: "i" } });
+
+        if (autoresEncontrados.length === 0) {
+          return next(new NaoEncontrado("Nenhum autor encontrado com esse nome."));
+        }
+
+        busca.autor = { $in: autoresEncontrados.map((autor) => autor._id) };
+      }
+
+      const livrosResultado = await livros.find(busca)
+        .populate("autor", "nome")
+        .exec();
 
       res.status(200).send(livrosResultado);
     } catch (erro) {
