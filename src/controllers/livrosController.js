@@ -1,5 +1,5 @@
 import NaoEncontrado from "../erros/NaoEncontrado.js";
-import livros from "../models/Livro.js";
+import {livros} from "../models/index.js";
 
 class LivroController {
 
@@ -49,7 +49,7 @@ class LivroController {
     try {
       const id = req.params.id;
 
-      const livroResultado = await livros.findByIdAndUpdate(id, {$set: req.body});
+      const livroResultado = await livros.findByIdAndUpdate(id, {$set: req.body}, {runValidators: true});
 
       if (livroResultado !== null) {
         res.status(200).send({message: "Livro atualizado com sucesso"});
